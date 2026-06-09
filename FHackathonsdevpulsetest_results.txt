@@ -1,0 +1,52 @@
+
+==========================================================
+  DevPulse API + Agent Test Suite
+==========================================================
+
+── Core ──────────────────────────────────────────────
+  [FAIL]  [0]  GET /health
+           error: {'error': '<urlopen error [Errno 111] Connection refused>'}
+
+── Projects ──────────────────────────────────────────
+  [FAIL]  [0]  GET /api/projects
+           error: {'error': '<urlopen error [Errno 111] Connection refused>'}
+           0 projects in MongoDB
+  [FAIL]  [0]  GET /api/projects/health-scores
+           error: {'error': '<urlopen error [Errno 111] Connection refused>'}
+           error: <urlopen error [Errno 111] Connection refused>/100
+
+── Tasks ─────────────────────────────────────────────
+  [FAIL]  [0]  GET /api/tasks
+           error: {'error': '<urlopen error [Errno 111] Connection refused>'}
+           0 tasks in MongoDB
+
+── Dashboard Features ────────────────────────────────
+  [FAIL]  [0]  GET /api/briefing
+           error: {'error': '<urlopen error [Errno 111] Connection refused>'}
+  [FAIL]  [0]  GET /api/warnings
+           error: {'error': '<urlopen error [Errno 111] Connection refused>'}
+           0 deadline warnings
+
+── Analytics ─────────────────────────────────────────
+  [FAIL]  [0]  GET /api/analytics
+           error: {'error': '<urlopen error [Errno 111] Connection refused>'}
+
+── Activity ──────────────────────────────────────────
+  [FAIL]  [0]  GET /api/activity
+           error: {'error': '<urlopen error [Errno 111] Connection refused>'}
+           0 activity log entries
+
+── Agent Chat ────────────────────────────────────────
+  Asking: 'What projects do I have?'
+  [FAIL]  [0]  POST /api/chat (read projects)
+           error: {'error': '<urlopen error [Errno 111] Connection refused>'}
+
+  Asking agent to create a task...
+  [FAIL]  [0]  POST /api/chat (create task via MCP)
+           error: {'error': '<urlopen error [Errno 111] Connection refused>'}
+  [NOTE]  Task not found yet — may need a moment to sync
+
+==========================================================
+  Results: 0/11 passed
+  Failed tests: ['GET /health', 'GET /api/projects', 'GET /api/projects/health-scores', 'GET /api/tasks', 'GET /api/briefing', 'GET /api/warnings', 'GET /api/analytics', 'GET /api/activity', 'POST /api/chat (read projects)', 'POST /api/chat (create task via MCP)', 'Task persisted in MongoDB after agent create']
+==========================================================

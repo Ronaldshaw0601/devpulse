@@ -1,0 +1,57 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+*.egg
+*.egg-info/
+dist/
+build/
+.venv/
+venv/
+env/
+
+# Environment variables — never commit secrets
+backend/.env
+.env
+
+# Node
+node_modules/
+frontend/node_modules/
+
+# Vite / build output
+frontend/dist/
+frontend/.vite/
+
+# Logs
+*.log
+seed_log.txt
+test_results.txt
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.suo
+*.user
+
+# MongoDB
+*.bson
+
+# Misc / dev-only scripts
+diagnose.bat
+diagnose.py
+install_certifi.bat
+run_tests.bat
+run_tests.py
+seed.ps1
+seed_data.bat
+seed_data.mjs
+seed_via_api.bat
+package.json
+package-lock.json
+F:\*
