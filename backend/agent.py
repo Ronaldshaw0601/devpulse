@@ -152,6 +152,23 @@ tools = types.Tool(function_declarations=[
         )
     ),
     types.FunctionDeclaration(
+        name="create_project",
+        description="Create a new project in MongoDB",
+        parameters=types.Schema(
+            type=types.Type.OBJECT,
+            properties={
+                "name": types.Schema(type=types.Type.STRING, description="Project name"),
+                "description": types.Schema(type=types.Type.STRING, description="Short project description"),
+                "client": types.Schema(type=types.Type.STRING, description="Client or owner name"),
+                "deadline": types.Schema(type=types.Type.STRING, description="Deadline in YYYY-MM-DD format"),
+                "priority": types.Schema(type=types.Type.STRING, description="Priority: high, medium, or low"),
+                "tech_stack": types.Schema(type=types.Type.STRING, description="Comma separated tech stack e.g. React,Node,MongoDB"),
+                "type": types.Schema(type=types.Type.STRING, description="Project type: personal or client"),
+            },
+            required=["name", "description", "deadline", "priority"]
+        )
+    ),
+    types.FunctionDeclaration(
         name="complete_task",
         description="Mark a task as completed and log the activity",
         parameters=types.Schema(
@@ -321,6 +338,31 @@ def execute_tool(tool_name: str, tool_args: dict) -> str:
                 "success": True,
                 "created_count": len(created),
                 "tasks_created": created,
+                "via": "mongodb-mcp-server" if _use_mcp() else "pymongo",
+            })
+
+        elif tool_name == "create_project":
+            tech_stack = [t.strip() for t in tool_args.get("tech_stack", "").split(",") if t.strip()]
+            now_str = datetime.utcnow().isoformat()
+            new_project = {
+                "name": tool_args["name"],
+                "description": tool_args.get("description", ""),
+                "client": tool_args.get("client", "Personal"),
+                "deadline": tool_args.get("deadline", ""),
+                "priority": tool_args.get("priority", "medium"),
+                "tech_stack": tech_stack,
+                "type": tool_args.get("type", "personal"),
+                "status": "active",
+                "created_at": now_str,
+            }
+            if _use_mcp():
+                mcp_bridge.insert_one("projects", new_project)
+            else:
+                new_project["created_at"] = datetime.utcnow()
+                projects_col.insert_one(new_project)
+            return json.dumps({
+                "success": True,
+                "message": f"Project '{tool_args['name']}' created successfully",
                 "via": "mongodb-mcp-server" if _use_mcp() else "pymongo",
             })
 
