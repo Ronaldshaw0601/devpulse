@@ -2,11 +2,14 @@
 
 > **Google Cloud x MongoDB Hackathon 2026**
 
-DevPulse is a personal AI agent for solo developers managing multiple software projects. It connects your MongoDB Atlas data to Google's Gemini 2.5 Flash via the **MongoDB MCP Server**, enabling a conversational AI agent that can read your projects, create tasks, find blockers, and generate intelligent daily plans — all in real time.
+DevPulse is a personal AI agent for solo developers managing multiple software projects. It connects your MongoDB Atlas data to Google's Gemini 2.0 Flash via the **MongoDB MCP Server**, enabling a conversational AI agent that can read your projects, create tasks, find blockers, and generate intelligent daily plans — all in real time.
 
 ---
 
-## Demo
+## Live Demo
+
+- **Frontend:** https://devpulse-omega-blush.vercel.app/
+- **Backend API:** https://devpulse-backend-309761897313.us-central1.run.app/docs
 
 > _[Add your demo video link here]_
 
@@ -14,15 +17,15 @@ DevPulse is a personal AI agent for solo developers managing multiple software p
 
 ## Features
 
-### AI Agent (Gemini 2.5 Flash)
+### AI Agent (Gemini 2.0 Flash)
 - **Streaming chat** — real-time token-by-token responses via SSE
-- **Tool use** — agent reads/writes MongoDB directly: get projects, create tasks, complete tasks, find blockers
+- **Tool use** — agent reads/writes MongoDB directly: create projects, create tasks, complete tasks, find blockers
 - **MongoDB MCP Bridge** — agent connects to Atlas via `@mongodb-js/mongodb-mcp-server` (stdio MCP protocol)
+- **Project breakdown** — tell the agent to create a project and break it into tasks in a single message
 
 ### Dashboard
 - **AI Daily Briefing** — time-aware (morning/afternoon/evening) summary of your workload, cached per period
 - **Deadline Warnings** — projects within 7 days of deadline surface automatically
-- **Daily Standup Generator** — one click generates a Slack-ready standup from yesterday's completions
 - **Weekly AI Report** — full week summary: what shipped, in progress, next week's priorities
 - **Today's AI Plan** — time-blocked schedule starting from current IST time
 
@@ -33,8 +36,9 @@ DevPulse is a personal AI agent for solo developers managing multiple software p
 
 ### Tasks
 - Full CRUD — create, view, filter by status/priority, mark complete
+- Shows all tasks including completed with live counts
 - File attachments per task (uploaded and stored in MongoDB)
-- Completion triggers activity log entries (used for standup/weekly report)
+- Completion triggers activity log entries
 
 ### Search
 - Full-text search across tasks, projects, and tags (`Cmd+K` / `Ctrl+K`)
@@ -50,7 +54,7 @@ DevPulse is a personal AI agent for solo developers managing multiple software p
 - **Clients** — group projects by client, AI-generate client status updates
 - **Activity Log** — chronological log of all completed tasks
 - **Time Allocation** — AI-generated deep/shallow/meeting work breakdown
-- **Settings** — light/dark theme, token usage tracking
+- **Settings** — light/dark theme (dark by default), token usage tracking
 
 ---
 
@@ -60,23 +64,23 @@ DevPulse is a personal AI agent for solo developers managing multiple software p
 ┌─────────────────────────────────────────────────────┐
 │                  React Frontend                      │
 │         (Vite + Tailwind CSS v4)                     │
-│              localhost:5173                          │
+│         devpulse-omega-blush.vercel.app              │
 └──────────────────────┬──────────────────────────────┘
                        │ REST + SSE
 ┌──────────────────────▼──────────────────────────────┐
-│              FastAPI Backend (Python 3.12)           │
-│                 localhost:8000                       │
+│         FastAPI Backend (Python 3.12)                │
+│         Google Cloud Run (us-central1)               │
 │                                                     │
 │  ┌────────────────┐    ┌──────────────────────────┐ │
 │  │   agent.py     │    │   routes/projects.py     │ │
 │  │                │    │                          │ │
 │  │ chat_with_     │    │  /api/briefing           │ │
 │  │ agent()        │    │  /api/plan/generate      │ │
-│  │ (agentic loop) │    │  /api/standup            │ │
-│  │                │    │  /api/weekly-report      │ │
-│  │ generate_text()│    │  /api/search             │ │
-│  │ (bare Gemini)  │    │  /api/projects/progress  │ │
-│  └───────┬────────┘    └──────────────────────────┘ │
+│  │ (agentic loop) │    │  /api/weekly-report      │ │
+│  │                │    │  /api/search             │ │
+│  │ generate_text()│    │  /api/projects/progress  │ │
+│  │ (bare Gemini)  │    └──────────────────────────┘ │
+│  └───────┬────────┘                                  │
 │          │                                           │
 │  ┌───────▼────────────────────────────────────────┐ │
 │  │           MCPCollection (db_mcp.py)            │ │
@@ -111,12 +115,13 @@ The AI agent communicates with MongoDB via the official `@mongodb-js/mongodb-mcp
 
 | Layer | Technology |
 |---|---|
-| Frontend | React 19, Vite 8, Tailwind CSS v4 |
+| Frontend | React 18, Vite 8, Tailwind CSS v4 |
 | Backend | FastAPI, Python 3.12, Uvicorn |
 | Database | MongoDB Atlas (M0 free tier) |
-| AI Model | Gemini 2.5 Flash (Google AI Studio) |
+| AI Model | Gemini 2.0 Flash (Google AI Studio) |
 | MCP Server | `@mongodb-js/mongodb-mcp-server` |
 | AI SDK | Google GenAI Python SDK (`google-genai`) |
+| Hosting | Google Cloud Run (backend), Vercel (frontend) |
 
 ---
 
@@ -132,7 +137,7 @@ The AI agent communicates with MongoDB via the official `@mongodb-js/mongodb-mcp
 ### 1. Clone the repo
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/devpulse.git
+git clone https://github.com/Ronaldshaw0601/devpulse.git
 cd devpulse
 ```
 
@@ -192,6 +197,8 @@ devpulse/
 │   ├── mcp_bridge.py        # MCP stdio protocol client
 │   ├── db_mcp.py            # MCPCollection wrapper (MCP → pymongo fallback)
 │   ├── database.py          # MongoDB Atlas connection (pymongo)
+│   ├── Dockerfile           # Cloud Run container (Python 3.12 + Node.js 20)
+│   ├── requirements.txt     # Python dependencies
 │   ├── routes/
 │   │   ├── projects.py      # All REST endpoints (projects, tasks, AI features)
 │   │   └── chat.py          # SSE streaming chat endpoint
@@ -207,6 +214,7 @@ devpulse/
             ├── TasksPage.jsx        # Tasks with file uploads
             ├── AnalyticsPage.jsx    # Charts and metrics
             ├── SearchModal.jsx      # Cmd+K search
+            ├── TodaysPlan.jsx       # AI daily plan
             └── ...
 ```
 
@@ -220,12 +228,11 @@ devpulse/
 | GET | `/api/projects` | All active projects |
 | GET | `/api/projects/progress` | Real progress % per project |
 | GET | `/api/projects/health-scores` | AI health score per project |
-| GET | `/api/tasks` | All pending/in-progress tasks |
+| GET | `/api/tasks` | All tasks including completed |
 | POST | `/api/tasks/complete` | Mark task complete + log activity |
 | GET | `/api/briefing` | AI daily briefing (IST time-aware) |
 | GET | `/api/plan/today` | Fetch today's AI plan |
 | POST | `/api/plan/generate` | Generate new AI time-blocked plan |
-| GET | `/api/standup` | Generate daily standup text |
 | GET | `/api/weekly-report` | Generate weekly AI report |
 | GET | `/api/search?q=` | Full-text search tasks + projects |
 | GET | `/api/warnings` | Deadline warning alerts |
@@ -240,13 +247,13 @@ The agent uses two distinct Gemini call modes:
 
 **`chat_with_agent()`** — Full agentic loop for interactive chat
 - Has a DevPulse system prompt
-- Bound to 8 tools that read/write MongoDB via the MCP bridge
+- Bound to tools that read/write MongoDB via the MCP bridge
 - Iterates up to 5 rounds until no more tool calls are needed
 - Streams tokens back to the frontend via SSE
 
 **`generate_text()`** — Bare Gemini call for content generation
 - No system prompt, no tools
-- Used for briefing, standup, weekly report, and plan generation
+- Used for briefing, weekly report, and plan generation
 - Avoids the agent persona interfering with pure generation tasks
 
 ### Agent Tools
@@ -254,19 +261,20 @@ The agent uses two distinct Gemini call modes:
 | Tool | Description |
 |---|---|
 | `get_projects` | Fetch all active projects |
-| `get_tasks` | Fetch pending/in-progress tasks |
+| `get_tasks` | Fetch all tasks |
 | `get_blocked_tasks` | Fetch tasks with a blocked reason |
 | `get_recent_activity` | Last 10 activity log entries |
 | `get_project_details` | Full details for a specific project |
+| `create_project` | Create a new project in MongoDB |
 | `create_task` | Create a single task in MongoDB |
-| `create_multiple_tasks` | Bulk create tasks |
+| `create_multiple_tasks` | Bulk create tasks for a project |
 | `complete_task` | Mark task done + write to activity log |
 
 ---
 
 ## Time Zone
 
-All time-aware features (briefing, plan generation, standup) use IST (UTC+5:30).
+All time-aware features (briefing, plan generation) use IST (UTC+5:30).
 
 ---
 
