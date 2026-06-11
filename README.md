@@ -11,7 +11,7 @@ DevPulse is a personal AI agent for solo developers managing multiple software p
 - **Frontend:** https://devpulse-omega-blush.vercel.app/
 - **Backend API:** https://devpulse-backend-309761897313.us-central1.run.app/docs
 
-> _[Add your demo video link here]_
+> https://www.youtube.com/watch?v=gbXKxEK6lJE
 
 ---
 
