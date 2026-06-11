@@ -28,6 +28,8 @@ else:
         location=os.getenv("GCP_LOCATION", "us-central1"),
     )
 
+GEMINI_MODEL = os.getenv("GEMINI_MODEL", "gemini-2.5-flash")
+
 SYSTEM_PROMPT = """
 You are DevPulse, a personal AI agent for a solo developer
 managing multiple software projects simultaneously.
@@ -370,7 +372,7 @@ def generate_text(prompt: str, temperature: float = 0.4) -> str:
     """
     try:
         response = client.models.generate_content(
-            model="gemini-2.5-flash",
+            model=GEMINI_MODEL,
             contents=[types.Content(role="user", parts=[types.Part(text=prompt)])],
             config=types.GenerateContentConfig(temperature=temperature),
         )
@@ -409,7 +411,7 @@ def chat_with_agent(message: str, history: list) -> str:
             iteration += 1
 
             response = client.models.generate_content(
-                model="gemini-2.5-flash",
+                model=GEMINI_MODEL,
                 contents=gemini_history,
                 config=types.GenerateContentConfig(
                     system_instruction=SYSTEM_PROMPT,
@@ -437,7 +439,7 @@ def chat_with_agent(message: str, history: list) -> str:
                         "prompt_tokens": getattr(usage, "prompt_token_count", 0) or 0,
                         "output_tokens": getattr(usage, "candidates_token_count", 0) or 0,
                         "total_tokens": getattr(usage, "total_token_count", 0) or 0,
-                        "model": "gemini-2.5-flash",
+                        "model": GEMINI_MODEL,
                         "iteration": iteration,
                     })
             except Exception:
