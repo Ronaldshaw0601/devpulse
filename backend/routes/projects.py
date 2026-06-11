@@ -45,10 +45,7 @@ def get_projects():
 
 @router.get("/tasks")
 def get_tasks():
-    tasks = list(tasks_col.find(
-        {"status": {"$in": ["pending", "in_progress"]}},
-        {"_id": 0}
-    ).sort("priority", -1))
+    tasks = list(tasks_col.find({}, {"_id": 0}).sort("priority", -1))
     return {"tasks": tasks}
 
 @router.get("/activity")
